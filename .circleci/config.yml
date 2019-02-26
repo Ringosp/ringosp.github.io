@@ -1,0 +1,15 @@
+version: 2
+jobs:
+  build:
+    branches:
+      only:
+        - master
+
+    docker: 
+      - image: cibuilds/hugo:0.54
+    working_directory: ~/hugo
+    steps:
+      - checkout
+      - run:
+          name: Building blog pages
+          command: HUGO_ENV=production hugo -v -s .
