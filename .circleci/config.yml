@@ -7,10 +7,10 @@ jobs:
       - checkout
       - run:
           name: Building blog pages
-          command: HUGO_ENV=production hugo -v -s .
+          command: hugo --verbose --source .
       - persist_to_workspace:
-          root: .
-          paths: pubilc
+          root: public
+          paths: .
 
   docs-deploy:
     docker:
@@ -25,7 +25,6 @@ jobs:
             npm install -g --silent gh-pages@2.0.1
             git config user.email "ci-build@example.com"
             git config user.name "ci-build"
-      - run: ls -la api
       - add_ssh_keys:
           fingerprints:
             - "74:84:24:31:f3:29:55:b6:08:19:f7:c8:78:5d:9b:ad"
