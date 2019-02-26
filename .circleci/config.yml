@@ -1,10 +1,6 @@
 version: 2
 jobs:
   build:
-    branches:
-      only:
-        - master
-
     docker: 
       - image: cibuilds/hugo:0.54
     working_directory: ~/hugo
@@ -13,3 +9,39 @@ jobs:
       - run:
           name: Building blog pages
           command: HUGO_ENV=production hugo -v -s .
+      - persist_to_workspace:
+          root: .
+          paths: pubilc
+
+  docs-deploy:
+    docker:
+      - image: node:8.10.0
+    steps:
+      - checkout
+      - attach_workspace:
+          at: public
+      - run:
+          name: Install and configure dependencies
+          command: |
+            npm install -g --silent gh-pages@2.0.1
+            git config user.email "ci-build@example.com"
+            git config user.name "ci-build"
+      - run: ls -la api
+      - add_ssh_keys:
+          fingerprints:
+            - "74:84:24:31:f3:29:55:b6:08:19:f7:c8:78:5d:9b:ad"
+      - run:
+          name: Deploy docs to gh-pages branch
+          command: gh-pages --message "[skip ci] doc upload" --dist public
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build
+      - docs-deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
